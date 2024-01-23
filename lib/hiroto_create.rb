@@ -5,6 +5,9 @@ require_relative "hiroto_create/version"
 module HirotoCreate
   class Error < StandardError; end
   def self.hiroto_create
+    # .git ファイルを作る
+    system("git init")
+
     # リポジトリ名の入力
     print 'Enter the repository name: '
     repo_name = gets.chomp.strip
