@@ -2,34 +2,47 @@
 
 require_relative "hiroto_create/version"
 
-module HirotoCreate
-  class Error < StandardError; end
-  def self.hiroto_create
-    # .git ファイルを作る
-    system("git init")
+# ghコマンドがインストールされているか確認
+gh_installed = system('which gh > /dev/null')
 
-    # リポジトリ名の入力
-    print 'Enter the repository name: '
-    repo_name = gets.chomp.strip
+unless gh_installed
+  puts "ghコマンドが見つかりません。"
 
-    # GitHubユーザー名の入力
-    print 'Enter your GitHub username: '
-    username = gets.chomp.strip
+  # インストール確認
+  print "ghコマンドをインストールしますか？ (yes/no): "
+  user_input = gets.chomp.strip.downcase
 
-    # publicかprivateかを聞く
-    print 'Enter public or private: '
-    flag = gets.chomp.strip
+  case user_input
+  when 'yes'
+    # macOSの場合
+    if RUBY_PLATFORM.include?('darwin')
+      puts "GitHub CLI (gh)のインストール中..."
+      system('brew install gh') 
+      # インストールの完了を待機する
+    end
 
-    # リモートリポジトリのSSH
-    remote_repo_url = "git@github.com:#{username}/#{repo_name}.git"
+    # Linuxの場合 (ここではUbuntu)
+    if RUBY_PLATFORM.include?('linux')
+      puts "GitHub CLI (gh)のインストール中..."
+      system('sudo apt install gh') 
+      # インストールの完了を待機する
+    end
 
-    # リモートリポジトリの作成
-    system("gh repo create #{username}/#{repo_name} --#{flag}")
+    # インストールが成功したか再度確認
+    gh_installed_after_install = system('which gh > /dev/null')
+    if gh_installed_after_install
+      puts "GitHub CLI (gh)のインストールが完了しました。"
+    else
+      puts "GitHub CLI (gh)のインストールに失敗しました。手動でインストールしてください。"
+      exit(1)
+    end
 
-    # GitHubにログイン
-    system('gh auth login')
+  when 'いいえ', 'no'
+    puts "インストールを中止しました。hiroto_createを使用するには手動でghコマンドをインストールしてください。"
+    exit(1)
 
-    # リモートリポジトリへの接続
-    system("git remote add origin #{remote_repo_url}")
+  else
+    puts "無効な入力です。yesかnoで答えてください。"
+    exit(1)
   end
 end
