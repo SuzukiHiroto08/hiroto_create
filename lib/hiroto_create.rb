@@ -1,3 +1,4 @@
+# coding: utf-8
 # frozen_string_literal: true
 
 require_relative "hiroto_create/version"
@@ -56,7 +57,7 @@ module HirotoCreate
           exit(1)
         end
 
-      when 'いいえ', 'no'
+      when 'no'
         puts "インストールを中止しました。hiroto_createを使用するには手動でghコマンドをインストールしてください。"
         exit(1)
 
